@@ -78,11 +78,12 @@ def main():
     # Create a sample listener and controller
     listener = SampleListener()
     controller = Leap.Controller()
+    controller.set_policy_flags(Leap.Controller.POLICY_BACKGROUND_FRAMES)
 
-    time.sleep(2)
     # Have the sample listener receive events from the controller
     controller.add_listener(listener)
     # Keep the process running until Enter is pressed
+    time.sleep(1)
     print("Press Ctrl-C to quit...")
     try:
         #sys.stdin.readline()
