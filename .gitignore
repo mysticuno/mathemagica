@@ -1,3 +1,6 @@
 __pycache__/
 .*.sw*
 *.pyc
+.DS_Store
+lib/.DS_Store
+lib/OSX/.DS_Store
