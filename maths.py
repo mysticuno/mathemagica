@@ -6,7 +6,12 @@ from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 print("Leap module successfully imported")
 
 import os, sys, inspect, thread, time
-import math #serial, math
+import math, serial
+
+ARDUINO_PORT = "COM7" # The port where the Arduino is connected, verify before running
+BAUDRATE = 9600 # Similar to Hz, how many symbols transmitted to Arduino per second
+
+ser = serial.Serial(ARDUINO_PORT, BAUDRATE)
 
 class SampleListener(Leap.Listener):
     
@@ -17,7 +22,7 @@ class SampleListener(Leap.Listener):
         """
         Enables the Circle, Key Tap, Screen Tap, and Swipe gestures
         """
-        print("Connected")
+        print("Leap Connected")
 
         # Enable gestures
         controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
@@ -27,40 +32,49 @@ class SampleListener(Leap.Listener):
 
     def on_disconnect(self, controller):
         # Note: Not dispatched when running in a debugger.
-        print("Disconnected")
+        print("Leap Disconnected")
+        ser.write("0")
 
     def on_exit(self, controller):
         """
         Should write 0 to the Arduino and close the serial port
         """
-        pass
-        # ser.write("0")
-        # ser.close()
+        
+        ser.write("0")
+        ser.close()
         print("Exited")
 
     def on_frame(self, controller):
         """
+        Called every time the Leap registers a new frame. Where most of the
+        heavy-lifting for determining whether to send a signal to the Arduino
+        should happen.
         """
-        # Get the most recent frame and report some basic information
-        # print("Got a frame")
+
         frame = controller.frame()
-        a = 0 # TODO: What is this?
+
+        pin_voltage = 0 
+
         # Check if the hand has any fingers
         fingers = frame.pointables
         if fingers.is_empty:
-            a = 0
+            pin_voltage = 0
         else:
             print("Hand detected")
             finger = fingers.frontmost
             position = finger.tip_position
             # Code for maths
-            x = position.x / 50
-            y = (position.y - 50) / 50
-            f = math.pow(2,x)
-            if y >= -1.2 + f and y<= 1.2 + f:
-                a = 1
-                print("Detected finger at ({}, {})".format(x,y))
-    
+            #x = position.x / 50
+            #y = (position.y - 50) / 50
+            #f = math.pow(2,x)
+            #if y >= -1.2 + f and y<= 1.2 + f:
+
+            # For now, send "1" to Arduino is fingers detected over Leap
+            pin_voltage = 1
+            print("Detected finger at ({}, {}, {})".format(
+                    position.x, position.y, position.z))
+        ser.write(str(pin_voltage))
+        
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
             return "STATE_START"
@@ -83,17 +97,17 @@ def main():
     # Have the sample listener receive events from the controller
     controller.add_listener(listener)
     # Keep the process running until Enter is pressed
-    time.sleep(1)
+    time.sleep(1) # One second
     print("Press Ctrl-C to quit...")
     try:
         #sys.stdin.readline()
         while True:
-            time.sleep(2)
+            time.sleep(2) 
     except KeyboardInterrupt:
         pass
     finally:
         # Remove the sample listener when doen
-        controller.remove_listener(listener)
+        controller.remove_listener(listener) 
 
 if __name__ == "__main__":
     main()
