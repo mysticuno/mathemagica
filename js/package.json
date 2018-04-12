@@ -1,0 +1,18 @@
+{
+  "name": "mathemagica",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gl-matrix": "^2.4.0",
+    "johnny-five": "^0.14.3",
+    "leapjs": "^0.6.4",
+    "underscore": "^1.8.3",
+    "ws": "^5.1.1"
+  }
+}
