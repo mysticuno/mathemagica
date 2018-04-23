@@ -6,3 +6,4 @@ lib/.DS_Store
 lib/OSX/.DS_Store
 js/node_modules/
 js/package-lock.json
+node_modules/

@@ -1,5 +1,5 @@
 function createPlot(){
-        try {
+    try {
     // compile the expression once
         var expression = document.getElementById('eq').value;
         var expr = math.compile(expression);
@@ -26,47 +26,41 @@ function createPlot(){
         console.error(err);
         alert(err);
     }
-    }
-function draw(data, layout) {
+}
 
+function draw(data, layout) {
+    
     Plotly.newPlot('plot', data, layout);
 
 }
 var plotInfo = createPlot();
 
-
 document.getElementById('form').onsubmit = function (event) {
     event.preventDefault();
     plotInfo = createPlot();
-    funcPlot = plotInfo[0]
-    data = plotInfo[1]
-    layout = plotInfo[2]
+    funcPlot = plotInfo[0];
+    data = plotInfo[1];
+    layout = plotInfo[2];
     draw(data, layout);
 };
 
-var funcPlot = plotInfo[0]
-var data = plotInfo[1]
-var layout = plotInfo[2]
+var funcPlot = plotInfo[0];
+var data = plotInfo[1];
+var layout = plotInfo[2];
 draw(data, layout);
 
+// var socket = io("http://localhost:8080");
+// socket.connect('http://localhost:8080');
+funcPlot.on('plotly_hover', function(data){
 
-ws = new webSocket('ws://127.0.0.1:6437'),
-five = require('johnny-five'),
-board = new five.Board(),
-led, frame;
-
-board.on('ready', function() {
-    led = new five.Led(13);    
-    ws.on('message', function(data, flags) {
-        frame = JSON.parse(data); 
-        funcPlot.on('plotly_hover', function(data){
-
-            hoverInfo.innerHTML = 'hovering';
-            led.on();
-        })
-        .on('plotly_unhover', function(data){
-            hoverInfo.innerHTML = 'not hovering';
-            led.off();
-        });
-    });
+    hoverInfo.innerHTML = 'hovering';
+    // led.on();
+})
+.on('plotly_unhover', function(data){
+    hoverInfo.innerHTML = 'not hovering';
+    // led.off();
 });
+
+// Leap.loop({ hand: function(hand) 
+// var socket = io.connect(window.location.hostname + ':' + 8080);
+
