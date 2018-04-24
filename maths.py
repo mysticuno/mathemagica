@@ -8,7 +8,16 @@ print("Leap module successfully imported")
 import os, sys, inspect, thread, time
 import math, serial
 
-ARDUINO_PORT = "COM7" # The port where the Arduino is connected, verify before running
+# Find the port the Arduino is connected on
+ARDUINO_PORT = None
+for port in list(serial.tools.list_ports.comports()):
+    if "Arduino" in port[1]:
+        ARDUINO_PORT = port[0]
+        break
+if ARDUINO_PORT is None:
+    raise IOException("Did not find an Arduino port, is it plugged in?")
+
+#ARDUINO_PORT = "COM11" # The port where the Arduino is connected, verify before running
 BAUDRATE = 9600 # Similar to Hz, how many symbols transmitted to Arduino per second
 
 ser = serial.Serial(ARDUINO_PORT, BAUDRATE)
