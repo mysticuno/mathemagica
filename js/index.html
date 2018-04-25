@@ -6,39 +6,49 @@
 
   <script src="https://cdn.plot.ly/plotly-1.35.2.min.js"></script>
 
-  <style>
-    input[type=text] {
-      width: 300px;
-    }
-    input {
-      padding: 6px;
-    }
-    body, html, input {
-      font-family: sans-serif;
-      font-size: 11pt;
+  <!-- Famo.us, causes issues with Plot.ly -->
+<!--   <script type="text/javascript" src="./lib/famous.min.js"></script>
+ -->
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="public/famous.css" />
 
-    }
-    form {
-      margin: 20px 0;
-    }
-  </style>
+  <!-- <script type="text/javascript" src="../lib/jquery.min.js"></script> -->
+
+  <!-- Leap -->
+  <script type="text/javascript" src="public/leap.min.js"></script>
+  <script type="text/javascript" src="public/leap-plugins.min.js"></script>
+
 </head>
 <body>
 
+<div id="cursor"><div id='cursor2'></div></div>
 <form id="form">
   <label for="eq">Enter an equation:</label>
   <input type="text" id="eq" value="4 * sin(x) + 5 * cos(x/2)" />
   <input type="submit" value="Draw" />
 </form>
-
 <div id="plot"></div>
 <div id="hoverInfo" style="margin-left:80px;"></div>
 
 <p>
   Used plot library: <a href="https://plot.ly/javascript/">Plotly</a>
 </p>
-
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
+  var socket = io();
+  // $(function() {
+  //     $('form').submit(function() {
+  //         socket.emit('chat message', $('#m').val());
+  //         $('#m').val('');
+  //         return false;
+  //     });
+  //     socket.on('chat message', function(msg) {
+  //         $('#messages').append($('<li>').text(msg));
+  //     });
+  // });
+
   function draw() {
     try {
       // compile the expression once
@@ -67,11 +77,13 @@
 
       myPlot.on('plotly_hover', function(data){
 
-      hoverInfo.innerHTML = 'hovering';
-  })
-   .on('plotly_unhover', function(data){
-      hoverInfo.innerHTML = 'not hovering';
-  });
+        hoverInfo.innerHTML = 'hovering!';
+        socket.emit('line hover', {data: 'lol'});
+      }).on('plotly_unhover', function(data){
+        hoverInfo.innerHTML = 'not hovering';
+        socket.emit('line unhover', {data: 'poop'});
+
+      });
     }
     catch (err) {
       console.error(err);
@@ -87,8 +99,48 @@
   };
 
   draw();
+
+//Make the DIV element draggagle:
+dragElement(document.getElementById("cursor2"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  elmnt.onmousedown = dragMouseDown;
   
+  function dragMouseDown(e) {
+    e = e || window.event;
+    console.log('down');
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+   //console.log('down');
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    elmnt.target.parentElement.style.top = (elmnt.offsetTop - pos2) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    console.log('down');
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
 </script>
+<!-- <script type="text/javascript" src="./leapCursor.js"></script> -->
 
 </body>
 </html>
