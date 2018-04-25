@@ -3,10 +3,7 @@ var Engine = famous.core.Engine;
 var Modifier = famous.core.Modifier;
 var Transform = famous.core.Transform;
 var Surface = famous.core.Surface;
-//var ImageSurface = famous.surfaces.ImageSurface;
 var StateModifier = famous.modifiers.StateModifier;
-//var Draggable = famous.modifiers.Draggable;
-//var GridLayout = famous.views.GridLayout;
 
 var mainContext = Engine.createContext();
 
@@ -32,7 +29,7 @@ var cursorSurface = new Surface({
     properties : {
         backgroundColor: 'black',
         borderRadius: CURSORSIZE/2 + 'px',
-        pointerEvents : 'none',
+        pointerEvents : 'all',
         zIndex: 1
     }
 });

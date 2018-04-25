@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<div id="cursor"><div id='cursor2'></div></div>
+<!-- <div id="cursor"><div id='cursor2'></div></div> -->
 <form id="form">
   <label for="eq">Enter an equation:</label>
   <input type="text" id="eq" value="4 * sin(x) + 5 * cos(x/2)" />
@@ -81,9 +81,17 @@
         socket.emit('line hover', {data: 'lol'});
       }).on('plotly_unhover', function(data){
         hoverInfo.innerHTML = 'not hovering';
-        socket.emit('line unhover', {data: 'poop'});
-
+        socket.emit('line unhover', {data: 'poop'})
+      }).on('mouseenter', function(data){
+          socket.emit('line hover', {data: 'leap hover!!!'});
       });
+
+      myPlot.addEventListener('mouseenter', function() {
+        console.log('owo');
+        
+      });
+
+
     }
     catch (err) {
       console.error(err);
@@ -100,46 +108,8 @@
 
   draw();
 
-//Make the DIV element draggagle:
-dragElement(document.getElementById("cursor2"));
-
-function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  elmnt.onmousedown = dragMouseDown;
-  
-  function dragMouseDown(e) {
-    e = e || window.event;
-    console.log('down');
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
-
-  function elementDrag(e) {
-    e = e || window.event;
-   //console.log('down');
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    elmnt.target.parentElement.style.top = (elmnt.offsetTop - pos2) + "px";
-  }
-
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    console.log('down');
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
-}
 </script>
+<script type="text/javascript" src="public/LeapCursor.min.js"></script>
 <!-- <script type="text/javascript" src="./leapCursor.js"></script> -->
 
 </body>
