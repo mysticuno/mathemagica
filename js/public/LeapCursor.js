@@ -30,7 +30,7 @@ LeapCursor.prototype = {
     gestureColor        : '#88CFEB',
     color               : '#000000',
     
-    yOffset             : -320,
+    yOffset             : -160,
 
     palms               : null,
     fingers             : null,
@@ -237,7 +237,7 @@ LeapCursor.prototype = {
 
             if (clock.previousTime === 1000000) {
 
-                this.scroll(frame);
+//                this.scroll(frame);
 
                 handCount = frame.hands.length;
                 
@@ -262,7 +262,7 @@ LeapCursor.prototype = {
                      */
                     this.canvas.style.display = 'none';
                     
-                    elm = document.elementFromPoint(left, top + 20);
+                    elm = document.elementFromPoint(left + this.width/2, top +   this.height/2);
                     
                     this.canvas.style.display = 'block';
 
