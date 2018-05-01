@@ -3,51 +3,77 @@
 <head>
   <title>math.js | plot</title>
   <script src="https://unpkg.com/mathjs@4.1.1/dist/math.min.js"></script>
-  <script src="https://d3js.org/d3.v3.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-1.35.2.min.js"></script>
 
-  <!-- Famo.us, causes issues with Plot.ly -->
-<!--   <script type="text/javascript" src="./lib/famous.min.js"></script>
- -->
+  <!-- Load d3.js -->
+  <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  
   <!-- CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="public/famous.css" />
 
-  <!-- <script type="text/javascript" src="../lib/jquery.min.js"></script> -->
-
+  <!-- D3 CSS -->
+  <style>
+      /* tell the SVG path to be a blue line without any area fill */
+      path {
+        stroke: steelblue;
+        fill: none;
+      }
+      
+      .axis {
+        shape-rendering: crispEdges;
+      }
+      .x.axis line {
+        stroke: lightgrey;
+      }
+      .x.axis .minor {
+        stroke-opacity: .5;
+      }
+      .x.axis path {
+        display: none;
+      }
+      .y.axis line, .y.axis path {
+        fill: none;
+        stroke: #000;
+      }
+    </style>
 
 </head>
 <body>
 
-<!-- <div id="cursor"><div id='cursor2'></div></div> -->
-<form id="form">
-  <label for="eq">Enter an equation:</label>
-  <input type="text" id="eq" value="4 * sin(x) + 5 * cos(x/2)" />
-  <input type="submit" value="Draw" />
-</form>
-<div id="plot"></div>
-<div id="hoverInfo" style="margin-left:80px;"></div>
+  <form id="form">
+    <label for="eq">Enter an equation:</label>
+    <input type="text" id="eq" value="4 * sin(x) + 5 * cos(x/2)" />
+    <input type="submit" value="Draw" />
+  </form>
+  <div id="plot"><svg width="1500" height="600"></svg></div>
+  <div id="hoverInfo" style="margin-left:80px;">Not hovering...</div>
 
-<p>
-  Used plot library: <a href="https://plot.ly/javascript/">Plotly</a>
-</p>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-  var socket = io();
-  // $(function() {
-  //     $('form').submit(function() {
-  //         socket.emit('chat message', $('#m').val());
-  //         $('#m').val('');
-  //         return false;
-  //     });
-  //     socket.on('chat message', function(msg) {
-  //         $('#messages').append($('<li>').text(msg));
-  //     });
-  // });
+  <p>
+    Used plot library: <a href="https://d3js.org/">D3.js</a>
+  </p>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    var socket = io();
+    var chart;
+    function make() {
 
-  function draw() {
-    try {
+      d3.selectAll("svg > *").remove(); // Clear the graph before drawing a new one
+
+      // Move the plot a bit away from the margins
+      var svg = d3.select("svg"),
+          margin = {top: 20, right: 20, bottom: 30, left: 50},
+          width = +svg.attr("width") - margin.left - margin.right,
+          height = +svg.attr("height") - margin.top - margin.bottom,
+          g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var x = d3.scaleLinear()
+          .rangeRound([0, width]);
+
+      var y = d3.scaleLinear()
+          .rangeRound([height, 0]);
+
       // compile the expression once
       var expression = document.getElementById('eq').value;
       var expr = math.compile(expression);
@@ -55,156 +81,70 @@
       // evaluate the expression repeatedly for different values of x
       var xValues = math.range(-10, 10, 0.1).toArray();
       var yValues = xValues.map(function (x) {
-        return expr.eval({x: x});
+        return expr.eval({x: x}); 
       });
 
-      // render the plot using plotly
-      
-      var myPlot = document.getElementById('plot'),
-        x = [1, 2, 3, 4, 5],
-        y = [10, 20, 30, 20, 10],
-        data = [{x: xValues,
-                y: yValues,
-                type: 'scatter'
-                }],
-        layout = {hovermode:'closest',
-                    hoverdistance: 25};
-
-      Plotly.newPlot('plot', data, layout);
-
-      myPlot.on('plotly_hover', function(data){
-
-        hoverInfo.innerHTML = 'hovering!';
-        socket.emit('line hover', {data: 'lol'});
-      }).on('plotly_unhover', function(data){
-        hoverInfo.innerHTML = 'not hovering';
-        socket.emit('line unhover', {data: 'poop'})
-      }).on('mouseenter', function(data){
-          socket.emit('line hover', {data: 'leap hover!!!'});
+      var data = []
+      xValues.forEach(function(val, i) {
+        data.push({'x': val, 'y': yValues[i]})
       });
 
-      myPlot.addEventListener('mouseenter', function() {
-        console.log('owo');
-        
-      });
+      var line = d3.line()
+                   .curve(d3.curveLinear)
+                   .x(function(d) { return x(d.x); })
+                   .y(function(d) { return y(d.y); });
 
+      x.domain(d3.extent(data, function(d) { return d.x; }));
+      y.domain(d3.extent(data, function(d) { return d.y; }));
 
+      // Draw the x axis and move to the center
+      g.append("g")
+          .attr("transform", "translate(0," + height/2 + ")")
+          .call(d3.axisBottom(x))
+
+      // Draw the y axis and move to the center
+      g.append("g")
+          .attr("transform", "translate(" + width/2 +",0)")
+          .call(d3.axisLeft(y))
+          .attr("y", 6)
+          .attr("dy", "0.71em")
+
+      // Draw the actual points  
+      g.append("path")
+          .datum(data)
+          .attr("fill", "none") // Path is closed automatically so hide filling
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 15) // Wider stroke means more area to interact with
+          .attr("d", d3.line()
+                     .curve(d3.curveLinear)
+                     .x(function(d) { return x(d.x); })
+                     .y(function(d) { return y(d.y); })
+          ).attr("pointer-events", "stroke") // visiblePainted, visibleStroke, painted
+          .on('mouseenter', function() { // Should match event fired by LeapCursor.js
+            console.log('mouse');
+            hoverInfo.innerHTML = 'Hovering!';
+            socket.emit('line hover', {data: ''});
+          })
+          .on('mouseleave', function() { // Should match event fired by LeapCursor.js
+            console.log('left');
+            hoverInfo.innerHTML = 'Not hovering...';
+            socket.emit('line unhover', {data: ''});
+          }); 
     }
-    catch (err) {
-      console.error(err);
-      alert(err);
-    }
-  }
+    document.getElementById('form').onsubmit = function (event) {
+        event.preventDefault();
+        make(); // Redraw chart when we get a new function input
+      };
+    make();
+  </script>
 
-  
-
-  document.getElementById('form').onsubmit = function (event) {
-    event.preventDefault();
-    draw();
-  };
-
-  draw();
-
-</script>
-<script>
-var margin = {
-    top: 30,
-    right: 20,
-    bottom: 30,
-    left: 50
-};
-var width = 600 - margin.left - margin.right;
-var height = 270 - margin.top - margin.bottom;
-
-var parseDate = d3.time.format("%d-%b-%y").parse;
-
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
-
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
-
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
-
-var valueline = d3.svg.line()
-    .x(function (d) {
-      return x(d.date);
-    })
-    .y(function (d) {
-      return y(d.close);
-    });
-
-var svg = d3.select("form")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-// Get the data
-var data = [{
-    date: "1-May-12",
-    close: "58.13"
-}, {
-    date: "30-Apr-12",
-    close: "53.98"
-}, {
-    date: "27-Apr-12",
-    close: "67.00"
-}, {
-    date: "26-Apr-12",
-    close: "89.70"
-}, {
-    date: "25-Apr-12",
-    close: "99.00"
-}];
-
-data.forEach(function (d) {
-    d.date = parseDate(d.date);
-    d.close = +d.close;
-});
-
-// Scale the range of the data
-x.domain(d3.extent(data, function (d) {
-    return d.date;
-    }));
-y.domain([0, d3.max(data, function (d) {
-    return d.close;
-    })]);
-
-svg.append("path") // Add the valueline path.
-.attr("d", valueline(data));
-
-svg.append("g") // Add the X Axis
-.attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
-
-svg.append("g") // Add the Y Axis
-.attr("class", "y axis")
-    .call(yAxis);
-
-svg.on('mouseenter', function() {
-  console.log('mouse entered')
-  hoverInfo.innerHTML = 'hovering!';
-  socket.emit('line hover', {data: 'lol'});
-});
-svg.on('mouseleave', function() {
-  console.log('mouse left')
-  hoverInfo.innerHTML = 'not hovering';
-  socket.emit('line unhover', {data: 'poop'})
-});
-</script>
-
-<!-- For LeapCursor, with dependencies -->
-<!-- Leap -->
-<script type="text/javascript" src="public/leap.min.js"></script>
-<script type="text/javascript" src="public/leap-plugins.min.js"></script>
-<script type="text/javascript" src="public/three.min.js"></script>
-<script type="text/javascript" src="public/Detector.js"></script>
-<!-- <script type="text/javascript" src="public/LeapCursor.min.js"></script> -->
-<script type="text/javascript" src="public/LeapCursor.js"></script>
-
+  <!-- For LeapCursor, with dependencies -->
+  <script type="text/javascript" src="public/leap.min.js"></script>
+  <script type="text/javascript" src="public/leap-plugins.min.js"></script>
+  <script type="text/javascript" src="public/three.min.js"></script>
+  <script type="text/javascript" src="public/Detector.js"></script>
+  <script type="text/javascript" src="public/LeapCursor.js"></script>
 </body>
 </html>

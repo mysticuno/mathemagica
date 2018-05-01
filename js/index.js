@@ -19,14 +19,14 @@ io.on('connection', function(socket) {
     });
 
     socket.on('line hover', function(msg) {
-        console.log("hovering over a line " + msg.data);
+        console.log("hovering over a line ");
         if (led) {
             led.on();
         }
     });
 
     socket.on('line unhover', function(msg) {
-        console.log("unhovering over a line " + msg.data);
+        console.log("unhovering");
          if (led) {
             led.off();
         }
@@ -37,7 +37,7 @@ io.on('connection', function(socket) {
 var ws = new webSocket('ws://127.0.0.1:6437'),
     SerialPort = require("serialport"),
     five = require('johnny-five'),
-    port = new SerialPort("/dev/ttyS5"),
+    port = new SerialPort("/dev/ttyS11"),
     board = new five.Board({port: port}),
     led, frame;
 //console.log(SerialPort);

@@ -262,7 +262,7 @@ LeapCursor.prototype = {
                      */
                     this.canvas.style.display = 'none';
                     
-                    elm = document.elementFromPoint(left + this.width/2, top +   this.height/2);
+                    elm = document.elementFromPoint(left + this.width/2, top + this.height/2);
                     
                     this.canvas.style.display = 'block';
 
