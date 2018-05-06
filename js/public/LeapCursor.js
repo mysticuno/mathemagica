@@ -1,6 +1,7 @@
 /*
     Code for using LeapMotion as a cursor. 
     Special thanks to https://github.com/roboleary/LeapCursor.js
+    Modified to accommodate using multiple cursors for each of the fingers
 */
 
 var LeapCursor = function(options) { this.initialize(options || {}); };
@@ -336,9 +337,9 @@ LeapCursor.prototype = {
                     this.thumb.style.display = 'block';
 
                     if (thumbelm != this.thumbHighlightedElm) {                        
-                        this.fire('thumbleave');    
+                        this.fire('thumbenter', thumbelm);
                         this.thumbHighlightedElm = thumbelm;
-                        this.fire('thumbenter');
+                        this.fire('thumbleave', thumbelm);    
                     }
                     // TODO: Add the events for the other fingers
 
@@ -353,9 +354,9 @@ LeapCursor.prototype = {
                     this.index.style.display = 'block';
 
                     if (indexelm != this.indexHighlightedElm) {                        
-                        this.fire('indexleave');    
+                        this.fire('indexenter', indexelm);
                         this.indexHighlightedElm = indexelm;
-                        this.fire('indexenter');
+                        this.fire('indexleave', indexelm);    
                     }
 
                     var middleTop     = (-middleFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
@@ -369,9 +370,9 @@ LeapCursor.prototype = {
                     this.middle.style.display = 'block';
 
                     if (middleelm != this.middleHighlightedElm) {                        
-                        this.fire('middleleave');    
+                        this.fire('middleenter', middleelm);
                         this.middleHighlightedElm = middleelm;
-                        this.fire('middleenter');
+                        this.fire('middleleave', middleelm);    
                     }
                     var ringTop     = (-ringFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var ringLeft    = (ringFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -384,9 +385,9 @@ LeapCursor.prototype = {
                     this.ring.style.display = 'block';
 
                     if (ringelm != this.ringHighlightedElm) {                        
-                        this.fire('ringleave');    
+                        this.fire('ringenter', ringelm);
                         this.ringHighlightedElm = ringelm;
-                        this.fire('ringenter');
+                        this.fire('ringleave', ringelm);    
                     }
                     var pinkyTop     = (-pinkyFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var pinkyLeft    = (pinkyFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -399,9 +400,9 @@ LeapCursor.prototype = {
                     this.pinky.style.display = 'block';
 
                     if (pinkyelm != this.pinkyHighlightedElm) {                        
-                        this.fire('pinkyleave');    
+                        this.fire('pinkyenter', pinkyelm);
                         this.pinkyHighlightedElm = elm;
-                        this.fire('pinkyenter');
+                        this.fire('pinkyleave', pinkyelm);    
                     }
 
                     var top     = (-hand.stabilizedPalmPosition[1] * 3) + (window.innerHeight);
@@ -716,9 +717,9 @@ LeapCursor.prototype = {
         }
     },
 
-    fire: function(evt) {
+    fire: function(evt, elm) {
 
-        var elm = this.highlightedElm;
+//        var elm = this.highlightedElm;
         
         if (!elm) { return; }
         
