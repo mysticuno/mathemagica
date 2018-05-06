@@ -17,7 +17,7 @@ LeapCursor.prototype = {
     trainerEnabled      : false,
     evtController       : null,
     highlightedElm      : null,
-    thumbHighlighedElm  : null,
+    thumbHighlightedElm : null,
     indexHighlightedElm : null,
     middleHighlightedElm: null,
     ringHighlightedElm  : null,
@@ -337,9 +337,9 @@ LeapCursor.prototype = {
                     this.thumb.style.display = 'block';
 
                     if (thumbelm != this.thumbHighlightedElm) {                        
-                        this.fire('thumbenter', thumbelm);
+                        this.fire('thumbleave', 'thumb');    
                         this.thumbHighlightedElm = thumbelm;
-                        this.fire('thumbleave', thumbelm);    
+                        this.fire('thumbenter', 'thumb');
                     }
                     // TODO: Add the events for the other fingers
 
@@ -354,9 +354,9 @@ LeapCursor.prototype = {
                     this.index.style.display = 'block';
 
                     if (indexelm != this.indexHighlightedElm) {                        
-                        this.fire('indexenter', indexelm);
+                        this.fire('indexleave', 'index');    
                         this.indexHighlightedElm = indexelm;
-                        this.fire('indexleave', indexelm);    
+                        this.fire('indexenter', 'index');
                     }
 
                     var middleTop     = (-middleFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
@@ -370,9 +370,9 @@ LeapCursor.prototype = {
                     this.middle.style.display = 'block';
 
                     if (middleelm != this.middleHighlightedElm) {                        
-                        this.fire('middleenter', middleelm);
+                        this.fire('middleleave', 'middle');    
                         this.middleHighlightedElm = middleelm;
-                        this.fire('middleleave', middleelm);    
+                        this.fire('middleenter', 'middle');
                     }
                     var ringTop     = (-ringFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var ringLeft    = (ringFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -385,10 +385,11 @@ LeapCursor.prototype = {
                     this.ring.style.display = 'block';
 
                     if (ringelm != this.ringHighlightedElm) {                        
-                        this.fire('ringenter', ringelm);
+                        this.fire('ringleave', 'ring');    
                         this.ringHighlightedElm = ringelm;
-                        this.fire('ringleave', ringelm);    
+                        this.fire('ringenter', 'ring');
                     }
+
                     var pinkyTop     = (-pinkyFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var pinkyLeft    = (pinkyFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
                     this.pinky.style.top = pinkyTop + 'px';
@@ -400,9 +401,9 @@ LeapCursor.prototype = {
                     this.pinky.style.display = 'block';
 
                     if (pinkyelm != this.pinkyHighlightedElm) {                        
-                        this.fire('pinkyenter', pinkyelm);
-                        this.pinkyHighlightedElm = elm;
-                        this.fire('pinkyleave', pinkyelm);    
+                        this.fire('pinkyleave', 'pinky');    
+                        this.pinkyHighlightedElm = pinkyelm;
+                        this.fire('pinkyenter', 'pinky');
                     }
 
                     var top     = (-hand.stabilizedPalmPosition[1] * 3) + (window.innerHeight);
@@ -717,9 +718,28 @@ LeapCursor.prototype = {
         }
     },
 
-    fire: function(evt, elm) {
+    fire: function(evt, fingerType) {
+        var elm;
+        switch (fingerType) {
+            case 'thumb':
+                elm = this.thumbHighlightedElm;
+                break;
+            case 'index':
+                elm = this.indexHighlightedElm;
+                break;
+            case 'middle':
+                elm = this.middleHighlightedElm;
+                break;
+            case 'ring':
+                elm = this.ringHighlightedElm;
+                break;
+            case 'pinky':
+                elm = this.pinkyHighlightedElm;
+                break;
+            default:
+                elm = this.highlightedElm;
+        }
 
-//        var elm = this.highlightedElm;
         
         if (!elm) { return; }
         
