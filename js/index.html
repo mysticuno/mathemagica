@@ -131,7 +131,48 @@
             console.log('left');
             hoverInfo.innerHTML = 'Not hovering...';
             socket.emit('line unhover', {data: ''});
+          })
+          .on('thumbenter', function() {
+            hoverInfo.innerHTML = 'Thumb';
+            console.log('thumb entered');
+          })
+          .on('thumbleave', function() {
+            hoverInfo.innerHTML = 'Not hovering...';
+            console.log('thumb left');
+          }) 
+          .on('indexenter', function() {
+            hoverInfo.innerHTML = 'Index';
+            console.log('index entered');
+          })
+          .on('indexleave', function() {
+            hoverInfo.innerHTML = 'Not hovering...';
+            console.log('index left');
+          })
+          .on('middleenter', function() {
+            hoverInfo.innerHTML = 'Middle';
+            console.log('middle entered');
+          })
+          .on('middleleave', function() {
+            hoverInfo.innerHTML = 'Not hovering...';
+            console.log('middle left');
+          }) 
+          .on('ringenter', function() {
+            hoverInfo.innerHTML = 'Ring';
+            console.log('ring entered');
+          })
+          .on('ringleave', function() {
+            hoverInfo.innerHTML = 'Not hovering...';
+            console.log('ring left');
+          })
+          .on('pinkyenter', function() {
+            hoverInfo.innerHTML = 'Pinky';
+            console.log('pinky entered');
+          })
+          .on('pinkyleave', function() {
+            hoverInfo.innerHTML = 'Not hovering...';
+            console.log('pinky left');
           }); 
+
     }
     document.getElementById('form').onsubmit = function (event) {
         event.preventDefault();

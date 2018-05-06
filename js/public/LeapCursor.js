@@ -16,6 +16,11 @@ LeapCursor.prototype = {
     trainerEnabled      : false,
     evtController       : null,
     highlightedElm      : null,
+    thumbHighlighedElm  : null,
+    indexHighlightedElm : null,
+    middleHighlightedElm: null,
+    ringHighlightedElm  : null,
+    pinkyHighlightedElm : null,
     
     target              : window,
     
@@ -51,6 +56,15 @@ LeapCursor.prototype = {
     speed               : [0, 0, 0],
     dampening           : 0.95,
     scrollSpeed         : 0.1,
+
+    pinky               : null,
+    ring                : null,
+    middle              : null,
+    index               : null,
+    thumb               : null,
+    fingerWidth         : 20,
+    fingerHeight        : 20,
+    fingerBorderRadius  : 10,
 
     /**
      *
@@ -93,6 +107,60 @@ LeapCursor.prototype = {
         this.trainer.on('TAP', function() { this.fire('click'); }.bind(this));
     },
 
+    createFingerDivs: function() {
+
+        this.thumb     = document.createElement('div');
+        this.thumb.style.position  = 'fixed';
+        this.thumb.style.width     = this.fingerWidth  + 'px';
+        this.thumb.style.height    = this.fingerHeight + 'px';
+        this.thumb.style.zIndex    = 999999999;
+        this.thumb.style.background = 'brown';
+        this.thumb.style.borderRadius = this.fingerBorderRadius + 'px';
+        this.thumb.setAttribute("id", "thumb");
+        document.body.appendChild(this.thumb);
+
+        this.index     = document.createElement('div');
+        this.index.style.position  = 'fixed';
+        this.index.style.width     = this.fingerWidth  + 'px';
+        this.index.style.height    = this.fingerHeight + 'px';
+        this.index.style.zIndex    = 999999999;
+        this.index.style.background = 'brown';
+        this.index.style.borderRadius = this.fingerBorderRadius + 'px';
+        this.index.setAttribute("id", "index");
+        document.body.appendChild(this.index);
+        
+        this.middle     = document.createElement('div');
+        this.middle.style.position  = 'fixed';
+        this.middle.style.width     = this.fingerWidth  + 'px';
+        this.middle.style.height    = this.fingerHeight + 'px';
+        this.middle.style.zIndex    = 999999999;
+        this.middle.style.background = 'brown';
+        this.middle.style.borderRadius = this.fingerBorderRadius + 'px';
+        this.middle.setAttribute("id", "middle");
+        document.body.appendChild(this.middle);
+        
+        this.ring     = document.createElement('div');
+        this.ring.style.position  = 'fixed';
+        this.ring.style.width     = this.fingerWidth  + 'px';
+        this.ring.style.height    = this.fingerHeight + 'px';
+        this.ring.style.zIndex    = 999999999;
+        this.ring.style.background = 'brown';
+        this.ring.style.borderRadius = this.fingerBorderRadius + 'px';
+        this.ring.setAttribute("id", "ring");
+        document.body.appendChild(this.ring);
+        
+        this.pinky     = document.createElement('div');
+        this.pinky.style.position  = 'fixed';
+        this.pinky.style.width     = this.fingerWidth  + 'px';
+        this.pinky.style.height    = this.fingerHeight + 'px';
+        this.pinky.style.zIndex    = 999999999;
+        this.pinky.style.background = 'brown';
+        this.pinky.style.borderRadius = this.fingerBorderRadius + 'px';
+        this.pinky.setAttribute("id", "pinky");
+        document.body.appendChild(this.pinky);
+        
+    },
+
     /**
      *
      * @param options
@@ -105,7 +173,6 @@ LeapCursor.prototype = {
         if (this.canvas == null) {
 
             this.canvas     = document.createElement('div');
-
             this.canvas.style.position  = 'fixed';
 
             this.canvas.style.width     = this.width  + 'px';
@@ -114,6 +181,7 @@ LeapCursor.prototype = {
             this.canvas.style.zIndex    = 999999999;
 
             document.body.appendChild(this.canvas);         
+            this.createFingerDivs()
         }
 
         /*
@@ -225,7 +293,7 @@ LeapCursor.prototype = {
          * In order to avoid as much variable creation as possible during animation, variables are created here once.
          */
         var hand, palm, handFingers, handFingerCount, finger, handCount, elm;/*palmCount = this.palms.length*/; 
-
+        var thumbelm, indexelm, middleelm, ringelm, pinkyelm;
         /*
          * Now we set up a Leap controller frame listener in order to animate the scene
          */
@@ -248,6 +316,94 @@ LeapCursor.prototype = {
                      */
                     hand = frame.hands[0];
 
+                    /*
+                     * Get the positions of the fingers
+                     */
+                    var thumbFinger = hand.thumb,
+                        indexFinger = hand.indexFinger,
+                        middleFinger = hand.middleFinger,
+                        ringFinger = hand.ringFinger,
+                        pinkyFinger = hand.pinky;
+
+                    var thumbTop     = (-thumbFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
+                    var thumbLeft    = (thumbFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
+                    this.thumb.style.top = thumbTop + 'px';
+                    this.thumb.style.left = thumbLeft + 'px';
+                    this.thumb.style.display = 'none';
+                    
+                    thumbelm = document.elementFromPoint(thumbLeft + this.fingerWidth/2, thumbTop + this.fingerHeight/2);
+                    
+                    this.thumb.style.display = 'block';
+
+                    if (thumbelm != this.thumbHighlightedElm) {                        
+                        this.fire('thumbleave');    
+                        this.thumbHighlightedElm = thumbelm;
+                        this.fire('thumbenter');
+                    }
+                    // TODO: Add the events for the other fingers
+
+                    var indexTop     = (-indexFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
+                    var indexLeft    = (indexFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
+                    this.index.style.top = indexTop + 'px';
+                    this.index.style.left = indexLeft + 'px';
+                    this.index.style.display = 'none';
+                    
+                    indexelm = document.elementFromPoint(indexLeft + this.fingerWidth/2, indexTop + this.fingerHeight/2);
+                    
+                    this.index.style.display = 'block';
+
+                    if (indexelm != this.indexHighlightedElm) {                        
+                        this.fire('indexleave');    
+                        this.indexHighlightedElm = indexelm;
+                        this.fire('indexenter');
+                    }
+
+                    var middleTop     = (-middleFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
+                    var middleLeft    = (middleFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
+                    this.middle.style.top = middleTop + 'px';
+                    this.middle.style.left = middleLeft + 'px';
+                    this.middle.style.display = 'none';
+                    
+                    middleelm = document.elementFromPoint(middleLeft + this.fingerWidth/2, middleTop + this.fingerHeight/2);
+                    
+                    this.middle.style.display = 'block';
+
+                    if (middleelm != this.middleHighlightedElm) {                        
+                        this.fire('middleleave');    
+                        this.middleHighlightedElm = middleelm;
+                        this.fire('middleenter');
+                    }
+                    var ringTop     = (-ringFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
+                    var ringLeft    = (ringFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
+                    this.ring.style.top = ringTop + 'px';
+                    this.ring.style.left = ringLeft + 'px';
+                    this.ring.style.display = 'none';
+                    
+                    ringelm = document.elementFromPoint(ringLeft + this.fingerWidth/2, ringTop + this.fingerHeight/2);
+                    
+                    this.ring.style.display = 'block';
+
+                    if (ringelm != this.ringHighlightedElm) {                        
+                        this.fire('ringleave');    
+                        this.ringHighlightedElm = ringelm;
+                        this.fire('ringenter');
+                    }
+                    var pinkyTop     = (-pinkyFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
+                    var pinkyLeft    = (pinkyFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
+                    this.pinky.style.top = pinkyTop + 'px';
+                    this.pinky.style.left = pinkyLeft + 'px';
+                    this.pinky.style.display = 'none';
+                    
+                    pinkyelm = document.elementFromPoint(pinkyLeft + this.fingerWidth/2, pinkyTop + this.fingerHeight/2);
+                    
+                    this.pinky.style.display = 'block';
+
+                    if (pinkyelm != this.pinkyHighlightedElm) {                        
+                        this.fire('pinkyleave');    
+                        this.pinkyHighlightedElm = elm;
+                        this.fire('pinkyenter');
+                    }
+
                     var top     = (-hand.stabilizedPalmPosition[1] * 3) + (window.innerHeight);
                     var left    = (hand.stabilizedPalmPosition[0] * 3) + (window.innerWidth/2);
 
@@ -262,7 +418,7 @@ LeapCursor.prototype = {
                      */
                     this.canvas.style.display = 'none';
                     
-                    elm = document.elementFromPoint(left + this.width/2, top + this.height/2);
+                    //elm = document.elementFromPoint(left + this.width/2, top + this.height/2);
                     
                     this.canvas.style.display = 'block';
 

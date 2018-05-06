@@ -37,30 +37,22 @@ io.on('connection', function(socket) {
 var ws = new webSocket('ws://127.0.0.1:6437'),
     SerialPort = require("serialport"),
     five = require('johnny-five'),
-    port = new SerialPort("/dev/ttyS11"),
-    board = new five.Board({port: port}),
+//    port = new SerialPort("/dev/ttyS11"),
+//    board = new five.Board({port: port}),
     led, frame;
 //console.log(SerialPort);
 //COM_PORT = new SerialPort("COM7", {baudrate: 9600, buffersize: 1}),
 SerialPort.list(function (err, ports) {
-		console.log(err,ports);
+		console.log(ports);
 });
 //var port = new SerialPort("/dev/ttyS7", {baudRate: 9600});
 //var board = new five.Board({port: port}),
 //    led, frame;
 
 // Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
-board.on('ready', function() {
-    led = new five.Led(12);    
-    /*ws.on('message', function(data, flags) {
-        frame = JSON.parse(data); 
-        if (frame.hands && frame.hands.length == 1) {
-            led.on();
-        } else {
-            led.off();
-        }
-    });*/
-});
+//board.on('ready', function() {
+//    led = new five.Led(12);    
+//});
 
 http.listen(3000, function() {
     console.log("listening on *:3000");
