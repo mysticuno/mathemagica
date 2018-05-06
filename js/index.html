@@ -123,46 +123,54 @@
                      .y(function(d) { return y(d.y); })
           ).attr("pointer-events", "stroke") // visiblePainted, visibleStroke, painted
           .on('mouseenter', function() { // Should match event fired by LeapCursor.js
-            console.log('mouse');
+            //console.log('mouse');
             hoverInfo.innerHTML = 'Hovering!';
-            socket.emit('line hover', {data: ''});
+            //socket.emit('line hover', {data: ''});
           })
           .on('mouseleave', function() { // Should match event fired by LeapCursor.js
-            console.log('left');
+            //console.log('left');
             hoverInfo.innerHTML = 'Not hovering...';
-            socket.emit('line unhover', {data: ''});
+            //socket.emit('line unhover', {data: ''});
           })
           .on('thumbenter', function() {
             hoverInfo.innerHTML = 'Thumb';
             console.log('thumb entered');
+            socket.emit('thumb enter');
           })
           .on('thumbleave', function() {
             hoverInfo.innerHTML = 'Not hovering...';
             console.log('thumb left');
+            socket.emit('thumb leave');
           }) 
           .on('indexenter', function() {
             hoverInfo.innerHTML = 'Index';
             console.log('index entered');
+            socket.emit('index enter');
           })
           .on('indexleave', function() {
             hoverInfo.innerHTML = 'Not hovering...';
             console.log('index left');
+            socket.emit('index leave');
           })
           .on('middleenter', function() {
             hoverInfo.innerHTML = 'Middle';
             console.log('middle entered');
+            socket.emit('middle enter');
           })
           .on('middleleave', function() {
             hoverInfo.innerHTML = 'Not hovering...';
             console.log('middle left');
+            socket.emit('middle leave');
           }) 
           .on('ringenter', function() {
             hoverInfo.innerHTML = 'Ring';
             console.log('ring entered');
+            socket.emit('ring enter');
           })
           .on('ringleave', function() {
             hoverInfo.innerHTML = 'Not hovering...';
             console.log('ring left');
+            socket.emit('ring leave');
           })
           .on('pinkyenter', function() {
             hoverInfo.innerHTML = 'Pinky';
