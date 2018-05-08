@@ -5,6 +5,16 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var webSocket = require('ws');
 
+// source: https://store.arduino.cc/usa/arduino-micro
+var MICRO_PWM_PINS = [3, 5, 6, 9, 10, 11, 13];
+var ledsReady = false;
+var useLeds = false; // For debugging, set to false if board is not plugged in
+const THUMB_LED = 11,
+      INDEX_LED = 10
+      MIDDLE_LED = 9,
+      RING_LED = 6;
+
+
 app.use("/public", express.static(__dirname + "/public"));
 
 app.get('/', function(req, res) {
@@ -18,32 +28,26 @@ io.on('connection', function(socket) {
         console.log('websocket disconnected');
     });
 
-/*    socket.on('line hover', function(msg) {
-        console.log("hovering over a line ");
-        if (led) {
-            led.on();
-        }
-    });
-
-    socket.on('line unhover', function(msg) {
-        console.log("unhovering");
-         if (led) {
-            led.off();
-        }
-    });*/
-
     socket.on('thumb enter', function() {
         console.log('Thumb is hovering over line');
-        if (thumbLed) {
-            thumbLed.on();
+//        if (thumbLed) {
+//            thumbLed.on();
+//        }
+        if (ledsReady) {
+            board.analogWrite(THUMB_LED, 255);
         }
     });
 
     socket.on('thumb leave', function() {
         console.log("Thumb left");
-        if (thumbLed) {
-            thumbLed.off();
+//        if (thumbLed) {
+//            thumbLed.brightness(30);
+//            thumbLed.off();
+//        }
+        if (ledsReady) {
+            board.analogWrite(THUMB_LED, 30);
         }
+
     });
 
     socket.on('index enter', function() {
@@ -101,17 +105,26 @@ var ws = new webSocket('ws://127.0.0.1:6437'),
 SerialPort.list(function (err, ports) {
 		console.log(ports);
 });
-var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
-var board = new five.Board({port: port});
-//    led, frame;
 
-// Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
-board.on('ready', function() {
-   thumbLed = new five.Led(12);
-   indexLed = new five.Led(11);
-   middleLed = new five.Led(10);
-   ringLed = new five.Led(9);
-});
+if (useLeds){
+
+    var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
+    var board = new five.Board({port: port});
+    //    led, frame;
+
+    // Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
+    board.on('ready', function() {
+        this.pinMode(THUMB_LED, five.Pin.PWM);
+        this.pinMode(INDEX_LED, five.Pin.PWM);
+        this.pinMode(MIDDLE_LED, five.Pin.PWM);
+        this.pinMode(RING_LED, five.Pin.PWM);
+        ledsReady = true;
+    //    thumbLed = new five.Led(THUMB_LED);
+    //    indexLed = new five.Led(INDEX_LED);
+    //    middleLed = new five.Led(MIDDLE_LED);
+    //    ringLed = new five.Led(RING_LED);
+    });
+}
 
 http.listen(3000, function() {
     console.log("listening on *:3000");
