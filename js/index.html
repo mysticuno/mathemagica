@@ -76,6 +76,7 @@
       var yMin = math.round(math.min(yValues));
       var yMax = math.round(math.max(yValues));
       const OFFSET = (yMax-yMin)/10; // to deal with the SVG mask
+      var coords = [0,0];
       p = functionPlot({
         target: '#plot',
         width: 1700,
@@ -92,21 +93,51 @@
           graphType: 'polyline',
           attr: {
             'stroke-width': '20px'
-          }
+          },
+          skipTip: true,
         }]
       });
-
+      var canvasX = p.meta.xScale.invert;
+      var canvasY = p.meta.yScale.invert;
       // Configure the mask to not cover the edges of the graph
       d3.select('.clip')
         .attr('y', CLIP_Y_OFFSET)
         .attr('height', CLIP_HEIGHT);
 
       // Have hovers go through canvas to line
-      d3.select('.zoom-and-drag').attr('style', 'fill: none; pointer-events:none'); 
+      d3.select('.zoom-and-drag').attr('style', 'fill: none; pointer-events:none');
+
+      // Compute y distance to point on graph
+      d3.select('.canvas').on('mousemove', function() {
+//          var coords = d3.mouse(this);
+//          let x = canvasX(coords[0]);
+//          let y = canvasY(coords[1]);
+//          console.log(x,y, math.abs(y - expr.eval({x: x})));
+            console.log('whoops', d3.event);
+        })
+        .on('thumbenter', function(elm) {
+            var coords = d3.event.detail.coords;
+            let x = canvasX(coords[1]);
+            let y = canvasY(coords[0]);
+            let y_hat = expr.eval({x: x});
+            console.log(coords, x, y, y_hat, Math.abs(y-y_hat));
+          // console.log(d3.mouse(this));
+          // console.log(d3.event.pageX);
+          // let x = canvasX(coords[0]);
+          // let y = canvasY(coords[1]);
+          // console.log(x,y, math.abs(y - expr.eval({x: x})));
+          console.log(elm);
+          console.log(d3.event.detail)
+      }); 
 
       // Add event listeners to main line
       d3.select('.line')
         .attr("pointer-events", "stroke") // visiblePainted, visibleStroke, painted
+        .on('mousemove', function() {
+          //console.log(d3.mouse(this));
+          //coords = d3.mouse(this);
+          //console.log(coords);
+        })
           .on('mouseenter', function() { // Should match event fired by LeapCursor.js
             console.log('mouse');
             hoverInfo.innerHTML = 'Hovering!';

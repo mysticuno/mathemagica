@@ -7,12 +7,12 @@ var webSocket = require('ws');
 
 // source: https://store.arduino.cc/usa/arduino-micro
 var MICRO_PWM_PINS = [3, 5, 6, 9, 10, 11, 13];
-var ledsReady = false;
-var useLeds = false; // For debugging, set to false if board is not plugged in
-const THUMB_LED = 11,
-      INDEX_LED = 10
-      MIDDLE_LED = 9,
-      RING_LED = 6;
+var ledsReady      = false;
+var useLeds        = true; // For debugging, set to false if board is not plugged in
+const THUMB_LED    = 11,
+      INDEX_LED    = 10
+      MIDDLE_LED   = 9,
+      RING_LED     = 6;
 
 
 app.use("/public", express.static(__dirname + "/public"));
@@ -45,50 +45,50 @@ io.on('connection', function(socket) {
 //            thumbLed.off();
 //        }
         if (ledsReady) {
-            board.analogWrite(THUMB_LED, 30);
+            board.analogWrite(THUMB_LED, 0);
         }
 
     });
 
     socket.on('index enter', function() {
         console.log('Index is hovering over line');
-        if (indexLed) {
-            indexLed.on();
+        if (ledsReady) {
+            board.analogWrite(INDEX_LED, 255);
         }
     });
 
     socket.on('index leave', function() {
         console.log("Index left");
-        if (indexLed) {
-            indexLed.off();
+        if (ledsReady) {
+            board.analogWrite(INDEX_LED, 0);
         }
     });
 
     socket.on('middle enter', function() {
         console.log('middle is hovering over line');
-        if (middleLed) {
-            middleLed.on();
+        if (ledsReady) {
+            board.analogWrite(MIDDLE_LED, 255);
         }
     });
 
     socket.on('middle leave', function() {
         console.log("middle left");
-        if (middleLed) {
-            middleLed.off();
+        if (ledsReady) {
+            board.analogWrite(MIDDLE_LED, 0);
         }
     });
 
     socket.on('ring enter', function() {
         console.log('ring is hovering over line');
-        if (ringLed) {
-           ringLed.on();
+        if (ledsReady) {
+           board.analogWrite(RING_LED, 255);
         }
     });
 
     socket.on('ring leave', function() {
         console.log("ring left");
-        if (ringLed) {
-            ringLed.off();
+        if (ledsReady) {
+            board.analogWrite(RING_LED, 0);
         }
     });
 
@@ -107,8 +107,8 @@ SerialPort.list(function (err, ports) {
 });
 
 if (useLeds){
-
-    var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
+    // @ERICA CHANGE PORT DOWN HERE
+    var port = new SerialPort("/dev/ttyS11", {baudRate: 9600});
     var board = new five.Board({port: port});
     //    led, frame;
 

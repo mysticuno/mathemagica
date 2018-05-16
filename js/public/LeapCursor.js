@@ -336,11 +336,11 @@ LeapCursor.prototype = {
                     
                     this.thumb.style.display = 'block';
 
-                    if (thumbelm != this.thumbHighlightedElm) {                        
-                        this.fire('thumbleave', 'thumb');    
+                  //  if (thumbelm != this.thumbHighlightedElm) {                        
+                        this.fire('thumbleave', 'thumb', [thumbTop+ this.fingerHeight/2, thumbLeft+ this.fingerWidth/2]);    
                         this.thumbHighlightedElm = thumbelm;
-                        this.fire('thumbenter', 'thumb');
-                    }
+                        this.fire('thumbenter', 'thumb', [thumbTop, thumbLeft]);
+                   // }
                     // TODO: Add the events for the other fingers
 
                     var indexTop     = (-indexFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
@@ -354,9 +354,9 @@ LeapCursor.prototype = {
                     this.index.style.display = 'block';
 
                     if (indexelm != this.indexHighlightedElm) {                        
-                        this.fire('indexleave', 'index');    
+                        this.fire('indexleave', 'index', [indexTop, indexLeft]);    
                         this.indexHighlightedElm = indexelm;
-                        this.fire('indexenter', 'index');
+                        this.fire('indexenter', 'index', [indexTop, indexLeft]);
                     }
 
                     var middleTop     = (-middleFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
@@ -370,9 +370,9 @@ LeapCursor.prototype = {
                     this.middle.style.display = 'block';
 
                     if (middleelm != this.middleHighlightedElm) {                        
-                        this.fire('middleleave', 'middle');    
+                        this.fire('middleleave', 'middle', [middleTop, middleLeft]);    
                         this.middleHighlightedElm = middleelm;
-                        this.fire('middleenter', 'middle');
+                        this.fire('middleenter', 'middle', [middleTop, middleLeft]);
                     }
                     var ringTop     = (-ringFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var ringLeft    = (ringFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -385,9 +385,9 @@ LeapCursor.prototype = {
                     this.ring.style.display = 'block';
 
                     if (ringelm != this.ringHighlightedElm) {                        
-                        this.fire('ringleave', 'ring');    
+                        this.fire('ringleave', 'ring', [ringTop, ringLeft]);    
                         this.ringHighlightedElm = ringelm;
-                        this.fire('ringenter', 'ring');
+                        this.fire('ringenter', 'ring', [ringTop, ringLeft]);
                     }
 
                     var pinkyTop     = (-pinkyFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
@@ -401,9 +401,9 @@ LeapCursor.prototype = {
                     this.pinky.style.display = 'block';
 
                     if (pinkyelm != this.pinkyHighlightedElm) {                        
-                        this.fire('pinkyleave', 'pinky');    
+                        this.fire('pinkyleave', 'pinky', [pinkyTop, pinkyLeft]);    
                         this.pinkyHighlightedElm = pinkyelm;
-                        this.fire('pinkyenter', 'pinky');
+                        this.fire('pinkyenter', 'pinky', [pinkyTop, pinkyLeft]);
                     }
 
                     var top     = (-hand.stabilizedPalmPosition[1] * 3) + (window.innerHeight);
@@ -420,17 +420,18 @@ LeapCursor.prototype = {
                      */
                     this.canvas.style.display = 'none';
                     
-                    //elm = document.elementFromPoint(left + this.width/2, top + this.height/2);
+                    // maybe remove? TODO
+                    elm = document.elementFromPoint(left + this.width/2, top + this.height/2);
                     
                     this.canvas.style.display = 'block';
 
                     if (elm != this.highlightedElm) {
                         
-                        this.fire('mouseleave');
+                        this.fire('mouseleave', null, [top, left] );
                         
                         this.highlightedElm = elm;
                         
-                        this.fire('mouseenter');
+                        this.fire('mouseenter', null, [top, left] );
                     }
 
                 } else {
@@ -718,7 +719,7 @@ LeapCursor.prototype = {
         }
     },
 
-    fire: function(evt, fingerType) {
+    fire: function(evt, fingerType, coords) {
         var elm;
         switch (fingerType) {
             case 'thumb':
@@ -747,11 +748,17 @@ LeapCursor.prototype = {
         
         if (document.createEvent) {
 
-            event = document.createEvent("HTMLEvents");
-            event.initEvent(evt, true, true);
+//            event = document.createEvent("HTMLEvents");
+//            event.initEvent(evt, true, true);
+            event = new CustomEvent(evt, {
+                detail: {
+                    name: fingerType,
+                    coords: coords
+                }
+            });
         
         } else {
-
+            console.log('here');
             event = document.createEventObject();
             event.eventType = evt;
         }
