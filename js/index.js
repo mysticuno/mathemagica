@@ -26,15 +26,23 @@ io.on('connection', function(socket) {
     console.log('connected to websocket');
     socket.on('disconnect', function() {
         console.log('websocket disconnected');
+        if (ledsReady) {
+            // Zero all motors
+            board.analogWrite(THUMB_LED, 0);
+            board.analogWrite(INDEX_LED, 0);
+            board.analogWrite(MIDDLE_LED, 0);
+            board.analogWrite(RING_LED, 0);
+//            board.analogWrite(PINKY_LED, 0);
+        }
     });
 
-    socket.on('thumb enter', function() {
-        console.log('Thumb is hovering over line');
+    socket.on('thumb enter', function(pwm) {
+        console.log('Thumb is hovering over line', pwm);
 //        if (thumbLed) {
 //            thumbLed.on();
 //        }
         if (ledsReady) {
-            board.analogWrite(THUMB_LED, 255);
+            board.analogWrite(THUMB_LED, pwm);
         }
     });
 
@@ -50,10 +58,10 @@ io.on('connection', function(socket) {
 
     });
 
-    socket.on('index enter', function() {
+    socket.on('index enter', function(pwm) {
         console.log('Index is hovering over line');
         if (ledsReady) {
-            board.analogWrite(INDEX_LED, 255);
+            board.analogWrite(INDEX_LED, pwm);
         }
     });
 
@@ -78,10 +86,10 @@ io.on('connection', function(socket) {
         }
     });
 
-    socket.on('ring enter', function() {
+    socket.on('ring enter', function(pwm) {
         console.log('ring is hovering over line');
         if (ledsReady) {
-           board.analogWrite(RING_LED, 255);
+           board.analogWrite(RING_LED, pwm);
         }
     });
 
@@ -108,7 +116,7 @@ SerialPort.list(function (err, ports) {
 
 if (useLeds){
     // @ERICA CHANGE PORT DOWN HERE
-    var port = new SerialPort("/dev/ttyS11", {baudRate: 9600});
+    var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
     var board = new five.Board({port: port});
     //    led, frame;
 

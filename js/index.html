@@ -61,6 +61,17 @@
     var p;
     const CLIP_Y_OFFSET = 9; // To hide the lines at the top of the graph
     const CLIP_HEIGHT = 542; // To hide the lines at the bottom of the graph
+    const VIB_THRESHOLD = 1.5;// num ticks, distance threshold past which to set PWM to 0
+    var getPWM = function(canvasX, canvasY, yScale, expr) {
+        let offset = Math.abs(yScale.ticks()[2] - yScale.ticks()[0]);
+        let actual_y = canvasY + offset;
+        let expected_y = expr.eval({x: canvasX});
+        let actual_diff = Math.abs(expected_y - actual_y);
+        let threshold = Math.abs(yScale.ticks()[1] - yScale.ticks()[0]) * VIB_THRESHOLD; 
+        let norm = 1 - Math.abs(actual_y - expected_y)/Math.abs(threshold - expected_y);
+        let pwm = Math.max(norm * 255, 0);
+        return pwm;
+    }
 
     function plot() {
       // compile the expression once
@@ -77,6 +88,10 @@
       var yMax = math.round(math.max(yValues));
       const OFFSET = (yMax-yMin)/10; // to deal with the SVG mask
       var coords = [0,0];
+
+      // For some reason, the y coordinates are offset by roughly two ticks, 
+      // so we manually add 2-ticks-worths to the y coordinate
+
       p = functionPlot({
         target: '#plot',
         width: 1700,
@@ -99,13 +114,17 @@
       });
       var canvasX = p.meta.xScale.invert;
       var canvasY = p.meta.yScale.invert;
+
+      var ticks = p.meta.yScale.ticks();
+      var y_canvas_offset = Math.abs(ticks[2] - ticks[0]);
+
       // Configure the mask to not cover the edges of the graph
       d3.select('.clip')
         .attr('y', CLIP_Y_OFFSET)
         .attr('height', CLIP_HEIGHT);
 
       // Have hovers go through canvas to line
-      d3.select('.zoom-and-drag').attr('style', 'fill: none; pointer-events:none');
+      d3.select('.zoom-and-drag')//.attr('style', 'fill: none; pointer-events:none')
 
       // Compute y distance to point on graph
       d3.select('.canvas').on('mousemove', function() {
@@ -113,22 +132,48 @@
 //          let x = canvasX(coords[0]);
 //          let y = canvasY(coords[1]);
 //          console.log(x,y, math.abs(y - expr.eval({x: x})));
-            console.log('whoops', d3.event);
+     //       console.log('whoops', d3.event);
         })
         .on('thumbenter', function(elm) {
             var coords = d3.event.detail.coords;
             let x = canvasX(coords[1]);
             let y = canvasY(coords[0]);
             let y_hat = expr.eval({x: x});
-            console.log(coords, x, y, y_hat, Math.abs(y-y_hat));
-          // console.log(d3.mouse(this));
-          // console.log(d3.event.pageX);
-          // let x = canvasX(coords[0]);
-          // let y = canvasY(coords[1]);
-          // console.log(x,y, math.abs(y - expr.eval({x: x})));
-          console.log(elm);
-          console.log(d3.event.detail)
-      }); 
+            let pwm = getPWM(x, y, p.meta.yScale, expr);
+            socket.emit('thumb enter', pwm)
+        }) 
+        .on('indexenter', function(elm) {
+            var coords = d3.event.detail.coords;
+            let x = canvasX(coords[1]);
+            let y = canvasY(coords[0]);
+            let y_hat = expr.eval({x: x});
+            let pwm = getPWM(x, y, p.meta.yScale, expr);
+            socket.emit('index enter', pwm)
+        }) 
+        .on('middleenter', function(elm) {
+            var coords = d3.event.detail.coords;
+            let x = canvasX(coords[1]);
+            let y = canvasY(coords[0]);
+            let y_hat = expr.eval({x: x});
+            let pwm = getPWM(x, y, p.meta.yScale, expr);
+            socket.emit('middle enter', pwm)
+        }) 
+        .on('ringenter', function(elm) {
+            var coords = d3.event.detail.coords;
+            let x = canvasX(coords[1]);
+            let y = canvasY(coords[0]);
+            let y_hat = expr.eval({x: x});
+            let pwm = getPWM(x, y, p.meta.yScale, expr);
+            socket.emit('ring enter', pwm)
+        }); 
+/*        .on('pinkyenter', function(elm) {
+            var coords = d3.event.detail.coords;
+            let x = canvasX(coords[1]);
+            let y = canvasY(coords[0]);
+            let y_hat = expr.eval({x: x});
+            let pwm = getPWM(x, y, p.meta.yScale, expr);
+            socket.emit('pinky enter', pwm)
+        }) */
 
       // Add event listeners to main line
       d3.select('.line')
