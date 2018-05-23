@@ -37,11 +37,19 @@
         fill: none;
         stroke: #000;
       }
+
+      form {
+        padding-left: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
     </style>
 
 </head>
 <body>
-
+  <!-- <h1>Mathemagica</h1> -->
   <form id="form">
     <label for="eq">Enter an equation:</label>
     <input type="text" id="eq" value="4*sin(x) + 5*cos(x/2)" />
@@ -61,15 +69,20 @@
     var p;
     const CLIP_Y_OFFSET = 9; // To hide the lines at the top of the graph
     const CLIP_HEIGHT = 542; // To hide the lines at the bottom of the graph
-    const VIB_THRESHOLD = 1.5;// num ticks, distance threshold past which to set PWM to 0
+    const VIB_THRESHOLD = 1;// num ticks, distance threshold past which to set PWM to 0
     var getPWM = function(canvasX, canvasY, yScale, expr) {
-        let offset = Math.abs(yScale.ticks()[2] - yScale.ticks()[0]);
-        let actual_y = canvasY + offset;
+        // let offset = 0;//Math.abs(yScale.ticks()[2] - yScale.ticks()[0]);
+        //let offset = $('.zoom-and-drag').offset(); // Get top and left offset for
+        let actual_y = canvasY;// + offset;
         let expected_y = expr.eval({x: canvasX});
         let actual_diff = Math.abs(expected_y - actual_y);
         let threshold = Math.abs(yScale.ticks()[1] - yScale.ticks()[0]) * VIB_THRESHOLD; 
         let norm = 1 - Math.abs(actual_y - expected_y)/Math.abs(threshold - expected_y);
+        // let norm = 1 - (Math.abs(actual_y - expected_y)/Math.abs(threshold - expected_y));
+        // let pwm = -Math.log10(Math.min(1, Math.max(1-norm, 0)))*255;
+        // console.log(pwm, norm, Math.max(norm, 0));
         let pwm = Math.max(norm * 255, 0);
+        console.log(pwm, norm, canvasX, canvasY);
         return pwm;
     }
 
@@ -101,6 +114,7 @@
         },
         yAxis: {
           domain: [yMin-OFFSET, yMax+OFFSET]
+          // domain: [yMin, yMax]
         },
         grid: true,
         data: [{
@@ -124,7 +138,7 @@
         .attr('height', CLIP_HEIGHT);
 
       // Have hovers go through canvas to line
-      d3.select('.zoom-and-drag')//.attr('style', 'fill: none; pointer-events:none')
+      d3.select('.zoom-and-drag').attr('style', 'fill: none; pointer-events:none');
 
       // Compute y distance to point on graph
       d3.select('.canvas').on('mousemove', function() {
@@ -134,46 +148,59 @@
 //          console.log(x,y, math.abs(y - expr.eval({x: x})));
      //       console.log('whoops', d3.event);
         })
-        .on('thumbenter', function(elm) {
+/*        .on('thumbenter', function(elm) {
             var coords = d3.event.detail.coords;
-            let x = canvasX(coords[1]);
-            let y = canvasY(coords[0]);
+
+             // Get top and left offset for canvas
+            let offset = $('.zoom-and-drag').offset();
+            let x = canvasX(coords[1]-offset.left);
+            let y = canvasY(coords[0]-offset.top);
+            console.log("Coords:", coords, "offset", offset, "x:", x, "y:",y);
             let y_hat = expr.eval({x: x});
             let pwm = getPWM(x, y, p.meta.yScale, expr);
-            socket.emit('thumb enter', pwm)
-        }) 
+            socket.emit('thumb enter', pwm);
+        }) */
         .on('indexenter', function(elm) {
             var coords = d3.event.detail.coords;
-            let x = canvasX(coords[1]);
-            let y = canvasY(coords[0]);
+            let offset = $('.zoom-and-drag').offset();
+            let x = canvasX(coords[1]-offset.left);
+            let y = canvasY(coords[0]-offset.top);
             let y_hat = expr.eval({x: x});
             let pwm = getPWM(x, y, p.meta.yScale, expr);
-            socket.emit('index enter', pwm)
+            socket.emit('index enter', pwm);
+            console.log('indexpwm', pwm)
         }) 
         .on('middleenter', function(elm) {
             var coords = d3.event.detail.coords;
-            let x = canvasX(coords[1]);
-            let y = canvasY(coords[0]);
+            let offset = $('.zoom-and-drag').offset();
+            let x = canvasX(coords[1]-offset.left);
+            let y = canvasY(coords[0]-offset.top);
             let y_hat = expr.eval({x: x});
             let pwm = getPWM(x, y, p.meta.yScale, expr);
-            socket.emit('middle enter', pwm)
+            socket.emit('middle enter', pwm);
         }) 
         .on('ringenter', function(elm) {
             var coords = d3.event.detail.coords;
-            let x = canvasX(coords[1]);
-            let y = canvasY(coords[0]);
+            let offset = $('.zoom-and-drag').offset();
+            let x = canvasX(coords[1]-offset.left);
+            let y = canvasY(coords[0]-offset.top);
             let y_hat = expr.eval({x: x});
             let pwm = getPWM(x, y, p.meta.yScale, expr);
-            socket.emit('ring enter', pwm)
-        }); 
-/*        .on('pinkyenter', function(elm) {
+            socket.emit('ring enter', pwm);
+        }) 
+        .on('pinkyenter', function(elm) {
             var coords = d3.event.detail.coords;
-            let x = canvasX(coords[1]);
-            let y = canvasY(coords[0]);
+            let offset = $('.zoom-and-drag').offset();
+            let x = canvasX(coords[1]-offset.left);
+            let y = canvasY(coords[0]-offset.top);
             let y_hat = expr.eval({x: x});
             let pwm = getPWM(x, y, p.meta.yScale, expr);
             socket.emit('pinky enter', pwm)
-        }) */
+        }) 
+        .on('motorsoff', function() {
+            console.log('motors off');
+            socket.emit('motorsoff');
+        });
 
       // Add event listeners to main line
       d3.select('.line')
@@ -183,7 +210,7 @@
           //coords = d3.mouse(this);
           //console.log(coords);
         })
-          .on('mouseenter', function() { // Should match event fired by LeapCursor.js
+        /*  .on('mouseenter', function() { // Should match event fired by LeapCursor.js
             console.log('mouse');
             hoverInfo.innerHTML = 'Hovering!';
             //socket.emit('line hover', {data: ''});
@@ -240,7 +267,7 @@
           .on('pinkyleave', function() {
             hoverInfo.innerHTML = 'Not hovering...';
             console.log('pinky left');
-          });;
+          });*/;
     }
     document.getElementById('form').onsubmit = function (event) {
         event.preventDefault();

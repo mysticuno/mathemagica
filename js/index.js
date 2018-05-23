@@ -7,13 +7,12 @@ var webSocket = require('ws');
 
 // source: https://store.arduino.cc/usa/arduino-micro
 var MICRO_PWM_PINS = [3, 5, 6, 9, 10, 11, 13];
-var ledsReady      = false;
-var useLeds        = true; // For debugging, set to false if board is not plugged in
-const THUMB_LED    = 11,
-      INDEX_LED    = 10
-      MIDDLE_LED   = 9,
-      RING_LED     = 6;
-
+var hardwareReady  = false;
+var useHardware    = true; // For debugging, set to false if board is not plugged in
+const INDEX_PIN    = 10
+      MIDDLE_PIN   = 9,
+      RING_PIN     = 6,
+      PINKY_PIN    = 11;
 
 app.use("/public", express.static(__dirname + "/public"));
 
@@ -26,80 +25,105 @@ io.on('connection', function(socket) {
     console.log('connected to websocket');
     socket.on('disconnect', function() {
         console.log('websocket disconnected');
-        if (ledsReady) {
+        if (hardwareReady) {
             // Zero all motors
-            board.analogWrite(THUMB_LED, 0);
-            board.analogWrite(INDEX_LED, 0);
-            board.analogWrite(MIDDLE_LED, 0);
-            board.analogWrite(RING_LED, 0);
-//            board.analogWrite(PINKY_LED, 0);
+            // board.analogWrite(THUMB_PIN, 0);
+            board.analogWrite(INDEX_PIN, 0);
+            board.analogWrite(MIDDLE_PIN, 0);
+            board.analogWrite(RING_PIN, 0);
+            board.analogWrite(PINKY_PIN, 0);
         }
     });
 
     socket.on('thumb enter', function(pwm) {
-        console.log('Thumb is hovering over line', pwm);
+        // console.log('Thumb is hovering over line', pwm);
 //        if (thumbLed) {
 //            thumbLed.on();
 //        }
-        if (ledsReady) {
-            board.analogWrite(THUMB_LED, pwm);
+        if (hardwareReady) {
+            // board.analogWrite(THUMB_PIN, pwm);
         }
     });
 
     socket.on('thumb leave', function() {
-        console.log("Thumb left");
+        // console.log("Thumb left");
 //        if (thumbLed) {
 //            thumbLed.brightness(30);
 //            thumbLed.off();
 //        }
-        if (ledsReady) {
-            board.analogWrite(THUMB_LED, 0);
+        if (hardwareReady) {
+            // board.analogWrite(THUMB_PIN, 0);
         }
 
     });
 
     socket.on('index enter', function(pwm) {
         console.log('Index is hovering over line');
-        if (ledsReady) {
-            board.analogWrite(INDEX_LED, pwm);
+        if (hardwareReady) {
+            board.analogWrite(INDEX_PIN, pwm);
         }
     });
 
     socket.on('index leave', function() {
         console.log("Index left");
-        if (ledsReady) {
-            board.analogWrite(INDEX_LED, 0);
+        if (hardwareReady) {
+            board.analogWrite(INDEX_PIN, 0);
         }
     });
 
-    socket.on('middle enter', function() {
+    socket.on('middle enter', function(pwm) {
         console.log('middle is hovering over line');
-        if (ledsReady) {
-            board.analogWrite(MIDDLE_LED, 255);
+        if (hardwareReady) {
+            board.analogWrite(MIDDLE_PIN, pwm);
         }
     });
 
     socket.on('middle leave', function() {
         console.log("middle left");
-        if (ledsReady) {
-            board.analogWrite(MIDDLE_LED, 0);
+        if (hardwareReady) {
+            board.analogWrite(MIDDLE_PIN, 0);
         }
     });
 
     socket.on('ring enter', function(pwm) {
         console.log('ring is hovering over line');
-        if (ledsReady) {
-           board.analogWrite(RING_LED, pwm);
+        if (hardwareReady) {
+           board.analogWrite(RING_PIN, pwm);
         }
     });
 
     socket.on('ring leave', function() {
         console.log("ring left");
-        if (ledsReady) {
-            board.analogWrite(RING_LED, 0);
+        if (hardwareReady) {
+            board.analogWrite(RING_PIN, 0);
         }
     });
 
+    socket.on('pinky enter', function(pwm) {
+        console.log('ring is hovering over line');
+        if (hardwareReady) {
+           board.analogWrite(PINKY_PIN, pwm);
+        }
+    });
+
+    socket.on('pinky leave', function() {
+        console.log("ring left");
+        if (hardwareReady) {
+            board.analogWrite(PINKY_PIN, 0);
+        }
+    });
+
+    socket.on('motorsoff', function() {
+        console.log('Hand left canvas, turning motors off');
+        if (hardwareReady) {
+            // Zero all motors
+            // board.analogWrite(THUMB_PIN, 0);
+            board.analogWrite(INDEX_PIN, 0);
+            board.analogWrite(MIDDLE_PIN, 0);
+            board.analogWrite(RING_PIN, 0);
+            board.analogWrite(PINKY_PIN, 0);
+        }
+    });
 });
 
 var ws = new webSocket('ws://127.0.0.1:6437'),
@@ -114,7 +138,7 @@ SerialPort.list(function (err, ports) {
 		console.log(ports);
 });
 
-if (useLeds){
+if (useHardware){
     // @ERICA CHANGE PORT DOWN HERE
     var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
     var board = new five.Board({port: port});
@@ -122,15 +146,15 @@ if (useLeds){
 
     // Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
     board.on('ready', function() {
-        this.pinMode(THUMB_LED, five.Pin.PWM);
-        this.pinMode(INDEX_LED, five.Pin.PWM);
-        this.pinMode(MIDDLE_LED, five.Pin.PWM);
-        this.pinMode(RING_LED, five.Pin.PWM);
-        ledsReady = true;
-    //    thumbLed = new five.Led(THUMB_LED);
-    //    indexLed = new five.Led(INDEX_LED);
-    //    middleLed = new five.Led(MIDDLE_LED);
-    //    ringLed = new five.Led(RING_LED);
+        this.pinMode(PINKY_PIN, five.Pin.PWM);
+        this.pinMode(INDEX_PIN, five.Pin.PWM);
+        this.pinMode(MIDDLE_PIN, five.Pin.PWM);
+        this.pinMode(RING_PIN, five.Pin.PWM);
+        hardwareReady = true;
+    //    thumbLed = new five.Led(THUMB_PIN);
+    //    indexLed = new five.Led(INDEX_PIN);
+    //    middleLed = new five.Led(MIDDLE_PIN);
+    //    ringLed = new five.Led(RING_PIN);
     });
 }
 
