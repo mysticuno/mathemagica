@@ -197,10 +197,6 @@
             let pwm = getPWM(x, y, p.meta.yScale, expr);
             socket.emit('pinky enter', pwm)
         }) 
-        .on('motorsoff', function() {
-            console.log('motors off');
-            socket.emit('motorsoff');
-        });
 
       // Add event listeners to main line
       d3.select('.line')
@@ -274,6 +270,10 @@
         plot();
       };
     plot();
+    document.body.addEventListener('motorsoff', function() {
+      console.log('motors are coming off');
+      socket.emit('motorsoff');
+    })
   </script>
 
   <!-- For LeapCursor, with dependencies -->

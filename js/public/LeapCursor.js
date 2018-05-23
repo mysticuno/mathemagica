@@ -354,11 +354,11 @@ LeapCursor.prototype = {
                     
                     this.index.style.display = 'block';
 
-                    if (indexelm != this.indexHighlightedElm) {                        
+                    // if (indexelm != this.indexHighlightedElm) {                        
                         this.fire('indexleave', 'index', [indexTop + this.fingerHeight/2, indexLeft + this.fingerHeight/2]);    
                         this.indexHighlightedElm = indexelm;
                         this.fire('indexenter', 'index', [indexTop + this.fingerHeight/2, indexLeft + this.fingerHeight/2]);
-                    }
+                    // }
 
                     var middleTop     = (-middleFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var middleLeft    = (middleFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -370,11 +370,11 @@ LeapCursor.prototype = {
                     
                     this.middle.style.display = 'block';
 
-                    if (middleelm != this.middleHighlightedElm) {                        
+                    // if (middleelm != this.middleHighlightedElm) {                        
                         this.fire('middleleave', 'middle', [middleTop + this.fingerWidth/2, middleLeft + this.fingerWidth/2]);
                         this.middleHighlightedElm = middleelm;
                         this.fire('middleenter', 'middle', [middleTop + this.fingerWidth/2, middleLeft + this.fingerWidth/2]);
-                    }
+                    // }
                     var ringTop     = (-ringFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var ringLeft    = (ringFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
                     this.ring.style.top = ringTop + 'px';
@@ -385,11 +385,11 @@ LeapCursor.prototype = {
                     
                     this.ring.style.display = 'block';
 
-                    if (ringelm != this.ringHighlightedElm) {
+                    // if (ringelm != this.ringHighlightedElm) {
                         this.fire('ringleave', 'ring', [ringTop + this.fingerWidth/2, ringLeft + this.fingerWidth/2]);    
                         this.ringHighlightedElm = ringelm;
                         this.fire('ringenter', 'ring', [ringTop + this.fingerWidth/2, ringLeft + this.fingerWidth/2]);
-                    }
+                    // }
 
                     var pinkyTop     = (-pinkyFinger.stabilizedTipPosition[1] * 3) + (window.innerHeight);
                     var pinkyLeft    = (pinkyFinger.stabilizedTipPosition[0] * 3) + (window.innerWidth/2);
@@ -401,11 +401,11 @@ LeapCursor.prototype = {
                     
                     this.pinky.style.display = 'block';
 
-                    if (pinkyelm != this.pinkyHighlightedElm) {
+                    // if (pinkyelm != this.pinkyHighlightedElm) {
                         this.fire('pinkyleave', 'pinky', [pinkyTop + this.fingerWidth/2, pinkyLeft + this.fingerWidth/2]);    
                         this.pinkyHighlightedElm = pinkyelm;
                         this.fire('pinkyenter', 'pinky', [pinkyTop + this.fingerWidth/2, pinkyLeft + this.fingerWidth/2]);
-                    }
+                    // }
 
                     var top     = (-hand.stabilizedPalmPosition[1] * 3) + (window.innerHeight);
                     var left    = (hand.stabilizedPalmPosition[0] * 3) + (window.innerWidth/2);
@@ -824,11 +824,11 @@ LeapCursor.prototype = {
 
         if (document.createEvent) {
             // Hackily letting the canvas dispatch this event
-            this.index.dispatchEvent(event);
+            document.body.dispatchEvent(event);
 
         } else {
 
-            this.index.fireEvent('on' + event.eventType, event);
+            document.body.fireEvent('on' + event.eventType, event);
         }       
 
     }
