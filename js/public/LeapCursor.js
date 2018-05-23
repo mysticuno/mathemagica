@@ -792,7 +792,6 @@ LeapCursor.prototype = {
 
     fireOffEvent: function(evt) {
         // First, move the elements representing fingers off the board
-        console.log('resetting elements');
         this.index.style.top   = (window.innerHeight - this.height - 20) + 'px';
         this.index.style.left  = (window.innerWidth - this.width - 20) + 'px';   
         this.middle.style.top  = (window.innerHeight - this.height - 20) + 'px';

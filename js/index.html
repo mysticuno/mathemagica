@@ -38,6 +38,10 @@
         stroke: #000;
       }
 
+      .y.origin, .x.origin {
+        opacity: 1.5;
+      }
+
       form {
         padding-left: 20px;
       }
@@ -63,7 +67,6 @@
   </p>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script type="text/javascript" src="public/mathemagica.js"></script>
 
   <!-- For LeapCursor, with dependencies -->
   <script type="text/javascript" src="public/leap.min.js"></script>
@@ -71,5 +74,8 @@
   <script type="text/javascript" src="public/three.min.js"></script>
   <script type="text/javascript" src="public/Detector.js"></script>
   <script type="text/javascript" src="public/LeapCursor.js"></script>
+  
+  <!-- Mathemagica.js, depends on the above libraries -->
+  <script type="text/javascript" src="public/mathemagica.js"></script>
 </body>
 </html>
