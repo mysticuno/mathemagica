@@ -2,6 +2,7 @@
     Code for using LeapMotion as a cursor. 
     Special thanks to https://github.com/roboleary/LeapCursor.js
     Modified to accommodate using multiple cursors for each of the fingers
+    for Mathemagica.
 */
 
 var LeapCursor = function(options) { this.initialize(options || {}); };

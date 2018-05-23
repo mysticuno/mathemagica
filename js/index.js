@@ -36,21 +36,12 @@ io.on('connection', function(socket) {
     });
 
     socket.on('thumb enter', function(pwm) {
-        // console.log('Thumb is hovering over line', pwm);
-//        if (thumbLed) {
-//            thumbLed.on();
-//        }
         if (hardwareReady) {
             // board.analogWrite(THUMB_PIN, pwm);
         }
     });
 
     socket.on('thumb leave', function() {
-        // console.log("Thumb left");
-//        if (thumbLed) {
-//            thumbLed.brightness(30);
-//            thumbLed.off();
-//        }
         if (hardwareReady) {
             // board.analogWrite(THUMB_PIN, 0);
         }
@@ -129,20 +120,14 @@ io.on('connection', function(socket) {
 var ws = new webSocket('ws://127.0.0.1:6437'),
     SerialPort = require("serialport"),
     five = require('johnny-five'),
-//    port = new SerialPort("/dev/ttyS11"),
-//    board = new five.Board({port: port}),
     thumbLed, indexLed, middleLed, ringLed, frame;
-//console.log(SerialPort);
-//COM_PORT = new SerialPort("COM5", {baudrate: 9600, buffersize: 1}),
-SerialPort.list(function (err, ports) {
-		console.log(ports);
-});
+    //COM_PORT = new SerialPort("COM5", {baudrate: 9600, buffersize: 1}), // Windows?
 
 if (useHardware){
-    // @ERICA CHANGE PORT DOWN HERE
+    // Depending on where on the computer the Arduino is plugged in, the port
+    // might change. Check using the Arduino IDE
     var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
     var board = new five.Board({port: port});
-    //    led, frame;
 
     // Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
     board.on('ready', function() {
@@ -151,10 +136,6 @@ if (useHardware){
         this.pinMode(MIDDLE_PIN, five.Pin.PWM);
         this.pinMode(RING_PIN, five.Pin.PWM);
         hardwareReady = true;
-    //    thumbLed = new five.Led(THUMB_PIN);
-    //    indexLed = new five.Led(INDEX_PIN);
-    //    middleLed = new five.Led(MIDDLE_PIN);
-    //    ringLed = new five.Led(RING_PIN);
     });
 }
 
