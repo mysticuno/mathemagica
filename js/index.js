@@ -117,6 +117,7 @@ io.on('connection', function(socket) {
     });
 });
 
+// Needed to interface with leapmotion
 var ws = new webSocket('ws://127.0.0.1:6437'),
     SerialPort = require("serialport"),
     five = require('johnny-five'),

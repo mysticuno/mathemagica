@@ -47,11 +47,24 @@ function plot() {
   var yValues = xValues.map(function (x) {
     return expr.eval({x: x}); 
   });
-  
+
   var xMin = math.round(math.min(xValues));
   var xMax = math.round(math.max(xValues));
+
   var yMin = math.round(math.min(yValues));
   var yMax = math.round(math.max(yValues));
+
+  
+  // var oldXMin = math.round(math.min(xValues));
+  // var oldXMax = math.round(math.max(xValues));
+
+  // var oldYMin = math.round(math.min(yValues));
+  // var oldYMax = math.round(math.max(yValues));
+
+  // var xMin = math.min(oldXMax, oldXMin);
+  // var xMax = math.max(oldXMax, oldXMin);
+  // var yMin = math.min(oldYMin, oldYMax);
+  // var yMax = math.max(oldYMin, oldYMax);
 
   const OFFSET = (yMax-yMin)/10; // to deal with the SVG mask
   var coords = [0,0];
