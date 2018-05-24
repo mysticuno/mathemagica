@@ -5,10 +5,20 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var webSocket = require('ws');
 
+// The port the Arduino is connected to, which can be found under
+// 'Tools > Serial Port' in the Arduino IDE. If the port on the IDE
+// is "COM5", then the corresponding WSL port is "/dev/ttyS5"
+var COM_PORT = "/dev/ttyS5"; // or "COM5" if running not from bash on windows
+
+// The websocket through which the Leap can talk to the system. Make sure that
+// the Leap Service is running in the background to open this port
+var LEAP_SOCKET = 'ws://127.0.0.1:6437';
+
 // source: https://store.arduino.cc/usa/arduino-micro
 var MICRO_PWM_PINS = [3, 5, 6, 9, 10, 11, 13];
 var hardwareReady  = false;
 var useHardware    = true; // For debugging, set to false if board is not plugged in
+
 const INDEX_PIN    = 10
       MIDDLE_PIN   = 9,
       RING_PIN     = 6,
@@ -35,6 +45,8 @@ io.on('connection', function(socket) {
         }
     });
 
+	// Currently, the setup uses all fingers except the thumb, but adding the
+	// the thumb is a matter of uncommenting the appropriate lines
     socket.on('thumb enter', function(pwm) {
         if (hardwareReady) {
             // board.analogWrite(THUMB_PIN, pwm);
@@ -118,19 +130,19 @@ io.on('connection', function(socket) {
 });
 
 // Needed to interface with leapmotion
-var ws = new webSocket('ws://127.0.0.1:6437'),
+var ws = new webSocket(LEAP_SOCKET),
     SerialPort = require("serialport"),
-    five = require('johnny-five'),
-    thumbLed, indexLed, middleLed, ringLed, frame;
-    //COM_PORT = new SerialPort("COM5", {baudrate: 9600, buffersize: 1}), // Windows?
+    five = require('johnny-five');
 
 if (useHardware){
     // Depending on where on the computer the Arduino is plugged in, the port
     // might change. Check using the Arduino IDE
-    var port = new SerialPort("/dev/ttyS5", {baudRate: 9600});
+    var port = new SerialPort(COM_PORT, {baudRate: 9600});
     var board = new five.Board({port: port});
 
-    // Will need to address Windows/OSX/Linux ports https://github.com/rwaldron/johnny-five/wiki/Board
+    // See https://github.com/rwaldron/johnny-five/wiki/Board for more information
+	// about the Board API and ports
+
     board.on('ready', function() {
         this.pinMode(PINKY_PIN, five.Pin.PWM);
         this.pinMode(INDEX_PIN, five.Pin.PWM);
