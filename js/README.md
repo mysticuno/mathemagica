@@ -1,4 +1,5 @@
 # Mathemagica: Visualizing Mathematical Relations using Haptic Feedback
+
 MIT 6.835 Term Project - LeapMotion + Haptic Feedback + Math
 [Carlos Henríquez](https://github.com/mysticuno), [Erica Yuen](https://github.com/ejyuen)
 {carlosh, ejyuen}@mit.edu
@@ -30,8 +31,7 @@ The current hardware is setup to use the index, middle, ring, and pinky fingers.
 ├ lib/                     // Libraries used for JavaScript dependencies
 ├ Mathemagica.pdf          // The project writeup
 ├ node_modules/            // Dependencies for the server
-├ package.json			   // Lists required packages
-├ package-lock.json
+├ package.json             // Lists required packages
 ├ public/
 │   ├ Detector.js          // Dependency for LeapCursor.js
 │   ├ famous.css           // Some styling
