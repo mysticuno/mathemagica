@@ -2,7 +2,6 @@
 
 MIT 6.835 Term Project - LeapMotion + Haptic Feedback + Math
 [Carlos Henríquez](https://github.com/mysticuno), [Erica Yuen](https://github.com/ejyuen)
-{carlosh, ejyuen}@mit.edu
 
 ## Installation
 
