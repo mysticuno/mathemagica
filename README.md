@@ -3,6 +3,10 @@
 MIT 6.835 Term Project - LeapMotion + Haptic Feedback + Math
 [Carlos Henríquez](https://github.com/mysticuno), [Erica Yuen](https://github.com/ejyuen)
 
+## Demo Video (links to YouTube)
+
+[![Mathemagica Demo Video](https://img.youtube.com/vi/T8obUf8qydA/0.jpg)](https://www.youtube.com/watch?v=T8obUf8qydA)
+
 ## Installation
 
 Run `npm install` then `node index.js` to start serving the web app. It is recommended that you use NVM to run the project with Node 8.0.0 (npm 5.0.0). If you have [NVM](https://github.com/creationix/nvm) installed, run `nvm run 8.0.0 index.js`.
